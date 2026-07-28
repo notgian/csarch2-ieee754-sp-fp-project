@@ -1,0 +1,30 @@
+{
+    "name": "spfp-simulation",
+    "homepage": "https://notgian.github.io/csarch2-ieee754-sp-fp-project",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "rsbuild build",
+        "dev": "rsbuild --open",
+        "preview": "rsbuild preview",
+
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d build"
+    },
+    "dependencies": {
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7"
+    },
+    "devDependencies": {
+        "@rsbuild/core": "^2.1.8",
+        "@rsbuild/plugin-react": "^2.1.0",
+        "@rsbuild/plugin-tailwindcss": "^2.0.3",
+        "@types/node": "^24.13.3",
+        "@types/react": "^19.2.17",
+        "@types/react-dom": "^19.2.3",
+        "gh-pages": "^6.3.0",
+        "tailwindcss": "^4.3.3",
+        "typescript": "^6.0.3"
+    }
+}
