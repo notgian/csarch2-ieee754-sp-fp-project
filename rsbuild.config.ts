@@ -4,10 +4,13 @@ import { pluginTailwindcss } from '@rsbuild/plugin-tailwindcss';
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
-  plugins: [
-    pluginReact({
-      reactCompiler: true,
-    }),
-    pluginTailwindcss(),
-  ],
+    plugins: [
+        pluginReact({
+            reactCompiler: true,
+        }),
+        pluginTailwindcss(),
+    ],
+    output: {
+        assetPrefix: '/csarch2-ieee754-sp-fp-project/',
+    }
 });
