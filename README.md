@@ -1,4 +1,6 @@
-# Rsbuild project
+# CSARCH2 Single Percision Floating Point Number Operations Simulator
+
+This project was initialized using **Rsbuild**
 
 ## Setup
 
@@ -9,7 +11,6 @@ npm install
 ```
 
 ## Get started
-
 Start the dev server, and the app will be available at [http://localhost:3000](http://localhost:3000).
 
 ```bash
@@ -27,6 +28,10 @@ Preview the production build locally:
 ```bash
 npm run preview
 ```
+
+## Deployment 
+
+A Github actions workflow has been defined for this repo to automatically rebuild the deployment when a push is made to main.
 
 ## Learn more
 
