@@ -4,25 +4,41 @@
  * @returns {string} the resulting BINARY format of the conversion, space separated every 4 digits.
  */
 function convertDec2BinFPSP(num: number) {
-    let signbit;
-    
-    // ensuring +/- zero is captured
-    if (num > 0 || Object.is(0, num))
-        signbit = '0';
-    else if (num < 0 || Object.is(-0, num))
-        signbit = '1';
-    else 
-        throw Error('Could not obtain the sign bit. Perhaps there is something wrong with the number input?')
+    // edge case to capture +/- zero
+    if (Object.is(0,num)) {
+        return "0000 0000 0000 0000 0000 0000 0000 0000"
+    } else if (Object.is(-0,num)) {
+        return "1000 0000 0000 0000 0000 0000 0000 0000"
+    }
+
+    let signbit = num > 0 ? '0' : '1';
 
     // get number (absolute val) as binary string
     let rawNumBinStr = Number(Math.abs(num)).toString(2);
 
-    // getting exponent
-    let binStrSplit = rawNumBinStr.split('.');
-    let splitA = binStrSplit[0];
-    let splitB = binStrSplit.length > 1 ? binStrSplit[1] : undefined;
+    // An intermediary step to make sure that the number
+    // is actually normalized to 1
+    let shift = 0;
+    let binStrSplit, splitA, splitB;
+    if (rawNumBinStr.startsWith('0')) {
+        // set this temporarily here before 
+        binStrSplit = rawNumBinStr.split('.');
+        splitA = binStrSplit[0];
+        splitB = binStrSplit.length > 1 ? binStrSplit[1] : '0';
 
-    let e = splitA.length - 1;
+        let shiftI = splitB.indexOf('1');
+        shiftI = shiftI > 126 ? 126 : shiftI; 
+        splitA = '1';
+        splitB = splitB.slice(shiftI+1);
+        shift = (shiftI + 1) * -1;
+    } else {
+        binStrSplit = rawNumBinStr.split('.');
+        splitA = binStrSplit[0];
+        splitB = binStrSplit.length > 1 ? binStrSplit[1] : '0';
+    }
+    
+    // getting exponent
+    let e = shift + splitA.length - 1;
     let ePrimeDec = e + 127;
     
     let ePrimeBinStr;
