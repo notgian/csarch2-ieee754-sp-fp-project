@@ -32,7 +32,7 @@ function convertDec2BinFPSP(num: number) {
         splitB = binStrSplit.length > 1 ? binStrSplit[1] : '0';
 
         let shiftI = splitB.indexOf('1');
-        shiftI = shiftI > 126 ? 126 : shiftI;
+        // shiftI = shiftI > 126 ? 126 : shiftI; 
         splitA = '1';
         splitB = splitB.slice(shiftI + 1);
         shift = (shiftI + 1) * -1;
@@ -72,6 +72,12 @@ function convertDec2BinFPSP(num: number) {
     let mantissa;
     if (specialState == 1) { // if infinity
         mantissa = ''.padStart(23, '0')
+    } else if (specialState == 2) { // if denormalized: shift right by the exponent deficit
+        const deficit = 1 - ePrimeDec; // see how far below the minimum normal exponent (-126) we are
+        const leadingZeros = Math.max(deficit - 1, 0);
+        mantissa = ''.padStart(leadingZeros, '0').concat('1').concat(splitB);
+        mantissa = mantissa.padEnd(23, "0");
+        mantissa = mantissa.substring(0, 23);
     } else {
         mantissa = splitA.slice(1, splitA.length);
         if (splitB) {
@@ -130,7 +136,7 @@ function convertDec2HexFPSP(num: number) {
         splitB = binStrSplit.length > 1 ? binStrSplit[1] : '0';
 
         let shiftI = splitB.indexOf('1');
-        shiftI = shiftI > 126 ? 126 : shiftI;
+        // shiftI = shiftI > 126 ? 126 : shiftI;
         splitA = '1';
         splitB = splitB.slice(shiftI + 1);
         shift = (shiftI + 1) * -1;
@@ -170,6 +176,12 @@ function convertDec2HexFPSP(num: number) {
     let mantissa;
     if (specialState == 1) { // if infinity
         mantissa = ''.padStart(23, '0')
+    } else if (specialState == 2) { // if denormalized: shift right by the exponent deficit
+        const deficit = 1 - ePrimeDec;
+        const leadingZeros = Math.max(deficit - 1, 0);
+        mantissa = ''.padStart(leadingZeros, '0').concat('1').concat(splitB);
+        mantissa = mantissa.padEnd(23, "0");
+        mantissa = mantissa.substring(0, 23);   
     } else {
         mantissa = splitA.slice(1, splitA.length);
         if (splitB) {
