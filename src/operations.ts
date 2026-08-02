@@ -351,12 +351,27 @@ function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetD
 }
 
 /**
+ * Helper to normalize "AxB^C" or "A*10^C" style scientific notation so
+ * parseFloat resolves the full value instead of truncating at the operator.
+ * @param {string} raw The raw operand input string
+ * @returns {string} A normalized string safe to pass to parseFloat
+ */
+function normalizeDecimalInput(raw: string): string {
+    const trimmed = raw.trim();
+    const sciMatch = trimmed.match(/^([+-]?\d*\.?\d+)\s*[xX*]\s*10\s*\^?\s*([+-]?\d+)$/);
+    if (sciMatch) {
+        return `${sciMatch[1]}e${sciMatch[2]}`;
+    }
+    return trimmed;
+}
+
+/**
  * Helper to convert input (Decimal or 8-digit IEEE Hex) to 32-bit binary string
  * @param {string} input The input number as a string
  * @returns {string} The 32-bit binary representation of the input
  */
 function getBin32(input: string): string {
-    const clean = input.trim();
+    const clean = normalizeDecimalInput(input);
     if (/^[0-9a-fA-F]{8}$/.test(clean)) {
         return parseInt(clean, 16).toString(2).padStart(32, '0');
     }

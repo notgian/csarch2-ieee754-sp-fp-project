@@ -150,3 +150,13 @@ describe('performOperation: special cases', () => {
         expect(res.decimal).toBe('0');
     });
 });
+
+// Unit test for scientific-notation input parsing ("x10^" and "*10^" styles)
+describe('performOperation: scientific notation input parsing', () => {
+    it('parses "x10^" and "*10^" notation to the same result', () => {
+        const resX = performOperation('9.726542319x10^15', '8.8736373412x10^13', 'addition', 'tiesToEven');
+        const resStar = performOperation('9.726542319*10^15', '8.8736373412*10^13', 'addition', 'tiesToEven');
+        expect(resX.decimal).toBe('9815278024130560');
+        expect(resStar.decimal).toBe('9815278024130560');
+    });
+});
