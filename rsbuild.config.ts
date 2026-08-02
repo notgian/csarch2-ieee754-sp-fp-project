@@ -12,5 +12,8 @@ export default defineConfig({
     ],
     output: {
         assetPrefix: '/csarch2-ieee754-sp-fp-project/',
+    },
+    html: {
+        title: 'Binary 32-bit Floating-Point Machine'
     }
 });
