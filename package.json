@@ -6,7 +6,9 @@
     "scripts": {
         "build": "rsbuild build",
         "dev": "rsbuild --open",
-        "preview": "rsbuild preview"
+        "preview": "rsbuild preview",
+        "test": "rstest",
+        "test:watch": "rstest -w"
     },
     "dependencies": {
         "react": "^19.2.7",
