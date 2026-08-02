@@ -5,7 +5,7 @@ type Base = 'decimal' | 'binary';
 type MethodKey = 'chopping' | 'roundUp' | 'roundDown' | 'tiesToEven';
 
 const METHOD_META: { key: MethodKey; label: string; rule: string }[] = [
-    { key: 'chopping', label: 'Chopping', rule: 'Truncate \u2014 always toward zero' },
+    { key: 'chopping', label: 'Truncating', rule: 'Truncate \u2014 always toward zero' },
     { key: 'roundUp', label: 'Round Up', rule: 'Toward +\u221e' },
     { key: 'roundDown', label: 'Round Down', rule: 'Toward \u2212\u221e' },
     { key: 'tiesToEven', label: 'Ties to Even', rule: 'Nearest; exact ties resolve to an even last digit' },
