@@ -241,12 +241,14 @@ function addOneToMagnitude(magStr: string, isBinary: boolean): string {
 
 /**
  * Demonstrates the four rounding methods based on IEEE 754 specifications.
- * @param {string} inputNum The input number as a string 
+ * @param {string} inputNum The input number as a string
  * @param {boolean} isBinary True if the input is binary, False if decimal
- * @param {number} targetFractionDigits The number of fractional digits/bits to round to
+ * @param {number} targetDigits The TOTAL number of significant digits/bits to keep,
+ *                               including the integer part (e.g. the leading "1" of a
+ *                               normalized mantissa like "1.xxxx").
  * @returns {object} An object containing the 4 rounded formats
  */
-function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetFractionDigits: number) {
+function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetDigits: number) {
     // Handles Sign
     const isNegative = inputNum.startsWith('-');
     const signStr = isNegative ? '-' : '';
@@ -259,7 +261,11 @@ function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetF
 
     const [intPart, fracPart] = magnitude.split('.');
 
-    // If the number already fits the target, return it as is 
+    // NOTE: "targetDigits" is the TOTAL significant-digit 
+    // The integer part always costs intPart.length digits out of that budget
+    const targetFractionDigits = Math.max(0, targetDigits - intPart.length);
+
+    // If the number already fits the target, return it as is
     if (fracPart.length <= targetFractionDigits) {
         const paddedFrac = fracPart.padEnd(targetFractionDigits, '0');
         const formattedResult = targetFractionDigits > 0 ? `${signStr}${intPart}.${paddedFrac}` : `${signStr}${intPart}`;
@@ -343,8 +349,6 @@ function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetF
         tiesToEven: resTiesToEven
     };
 }
-
-
 
 /**
  * Helper to convert input (Decimal or 8-digit IEEE Hex) to 32-bit binary string
