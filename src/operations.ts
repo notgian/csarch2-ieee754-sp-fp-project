@@ -32,7 +32,7 @@ function convertDec2BinFPSP(num: number) {
         splitB = binStrSplit.length > 1 ? binStrSplit[1] : '0';
 
         let shiftI = splitB.indexOf('1');
-        shiftI = shiftI > 126 ? 126 : shiftI;
+        // shiftI = shiftI > 126 ? 126 : shiftI; 
         splitA = '1';
         splitB = splitB.slice(shiftI + 1);
         shift = (shiftI + 1) * -1;
@@ -72,6 +72,12 @@ function convertDec2BinFPSP(num: number) {
     let mantissa;
     if (specialState == 1) { // if infinity
         mantissa = ''.padStart(23, '0')
+    } else if (specialState == 2) { // if denormalized: shift right by the exponent deficit
+        const deficit = 1 - ePrimeDec; // see how far below the minimum normal exponent (-126) we are
+        const leadingZeros = Math.max(deficit - 1, 0);
+        mantissa = ''.padStart(leadingZeros, '0').concat('1').concat(splitB);
+        mantissa = mantissa.padEnd(23, "0");
+        mantissa = mantissa.substring(0, 23);
     } else {
         mantissa = splitA.slice(1, splitA.length);
         if (splitB) {
@@ -130,7 +136,7 @@ function convertDec2HexFPSP(num: number) {
         splitB = binStrSplit.length > 1 ? binStrSplit[1] : '0';
 
         let shiftI = splitB.indexOf('1');
-        shiftI = shiftI > 126 ? 126 : shiftI;
+        // shiftI = shiftI > 126 ? 126 : shiftI;
         splitA = '1';
         splitB = splitB.slice(shiftI + 1);
         shift = (shiftI + 1) * -1;
@@ -170,6 +176,12 @@ function convertDec2HexFPSP(num: number) {
     let mantissa;
     if (specialState == 1) { // if infinity
         mantissa = ''.padStart(23, '0')
+    } else if (specialState == 2) { // if denormalized: shift right by the exponent deficit
+        const deficit = 1 - ePrimeDec;
+        const leadingZeros = Math.max(deficit - 1, 0);
+        mantissa = ''.padStart(leadingZeros, '0').concat('1').concat(splitB);
+        mantissa = mantissa.padEnd(23, "0");
+        mantissa = mantissa.substring(0, 23);   
     } else {
         mantissa = splitA.slice(1, splitA.length);
         if (splitB) {
@@ -229,12 +241,14 @@ function addOneToMagnitude(magStr: string, isBinary: boolean): string {
 
 /**
  * Demonstrates the four rounding methods based on IEEE 754 specifications.
- * @param {string} inputNum The input number as a string 
+ * @param {string} inputNum The input number as a string
  * @param {boolean} isBinary True if the input is binary, False if decimal
- * @param {number} targetFractionDigits The number of fractional digits/bits to round to
+ * @param {number} targetDigits The TOTAL number of significant digits/bits to keep,
+ *                               including the integer part (e.g. the leading "1" of a
+ *                               normalized mantissa like "1.xxxx").
  * @returns {object} An object containing the 4 rounded formats
  */
-function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetFractionDigits: number) {
+function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetDigits: number) {
     // Handles Sign
     const isNegative = inputNum.startsWith('-');
     const signStr = isNegative ? '-' : '';
@@ -247,7 +261,11 @@ function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetF
 
     const [intPart, fracPart] = magnitude.split('.');
 
-    // If the number already fits the target, return it as is 
+    // NOTE: "targetDigits" is the TOTAL significant-digit 
+    // The integer part always costs intPart.length digits out of that budget
+    const targetFractionDigits = Math.max(0, targetDigits - intPart.length);
+
+    // If the number already fits the target, return it as is
     if (fracPart.length <= targetFractionDigits) {
         const paddedFrac = fracPart.padEnd(targetFractionDigits, '0');
         const formattedResult = targetFractionDigits > 0 ? `${signStr}${intPart}.${paddedFrac}` : `${signStr}${intPart}`;
@@ -332,7 +350,20 @@ function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetF
     };
 }
 
-
+/**
+ * Helper to normalize "AxB^C" or "A*10^C" style scientific notation so
+ * parseFloat resolves the full value instead of truncating at the operator.
+ * @param {string} raw The raw operand input string
+ * @returns {string} A normalized string safe to pass to parseFloat
+ */
+function normalizeDecimalInput(raw: string): string {
+    const trimmed = raw.trim();
+    const sciMatch = trimmed.match(/^([+-]?\d*\.?\d+)\s*[xX*]\s*10\s*\^?\s*([+-]?\d+)$/);
+    if (sciMatch) {
+        return `${sciMatch[1]}e${sciMatch[2]}`;
+    }
+    return trimmed;
+}
 
 /**
  * Helper to convert input (Decimal or 8-digit IEEE Hex) to 32-bit binary string
@@ -340,7 +371,7 @@ function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetF
  * @returns {string} The 32-bit binary representation of the input
  */
 function getBin32(input: string): string {
-    const clean = input.trim();
+    const clean = normalizeDecimalInput(input);
     if (/^[0-9a-fA-F]{8}$/.test(clean)) {
         return parseInt(clean, 16).toString(2).padStart(32, '0');
     }
