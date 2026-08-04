@@ -1,7 +1,8 @@
 # Machine 2: Binary 32-bit Floating-Point Machine 
 CSARCH2 - S01 Project Proposal
 Group 2: Justin Ice David, Gian Lorenzo Ortha, Linus Carl Perdon, Neil Justine Tan, Khyle Villorente
-
+# Deployment Link
+[Binary 32-bit Floating-Point Machine](https://notgian.github.io/csarch2-ieee754-sp-fp-project/)
 # YouTube Demo Link
 [https://www.youtube.com/watch?v=gv0ugn_3nUA](https://www.youtube.com/watch?v=gv0ugn_3nUA)
 
