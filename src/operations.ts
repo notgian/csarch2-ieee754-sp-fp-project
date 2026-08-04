@@ -240,6 +240,23 @@ function addOneToMagnitude(magStr: string, isBinary: boolean): string {
 }
 
 /**
+ * Checks that a string is a well-formed magnitude in the given base.
+ * Binary accepts only 0/1 digits; decimal accepts 0-9. An optional leading
+ * sign and a single decimal point are allowed, and at least one digit is
+ * required.
+ * @param {string} raw The raw input string
+ * @param {boolean} isBinary True to validate against base 2, false for base 10
+ * @returns {boolean} True if the string is a valid magnitude in that base
+ */
+function isValidMagnitude(raw: string, isBinary: boolean): boolean {
+    const trimmed = (raw ?? '').trim();
+    const pattern = isBinary
+        ? /^[+-]?(?:[01]+(?:\.[01]*)?|\.[01]+)$/
+        : /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/;
+    return pattern.test(trimmed);
+}
+
+/**
  * Demonstrates the four rounding methods based on IEEE 754 specifications.
  * @param {string} inputNum The input number as a string
  * @param {boolean} isBinary True if the input is binary, False if decimal
@@ -249,10 +266,23 @@ function addOneToMagnitude(magStr: string, isBinary: boolean): string {
  * @returns {object} An object containing the 4 rounded formats
  */
 function demonstrateRoundingMethods(inputNum: string, isBinary: boolean, targetDigits: number) {
+    // Reject anything that is not a valid magnitude in the selected base.
+    // Without this, an invalid digit (e.g. "8" in binary mode) silently survives
+    // truncation as a string slice while the arithmetic paths produce NaN.
+    if (!isValidMagnitude(inputNum, isBinary) || !Number.isFinite(targetDigits) || targetDigits < 0) {
+        return {
+            chopping: 'NaN',
+            roundUp: 'NaN',
+            roundDown: 'NaN',
+            tiesToEven: 'NaN'
+        };
+    }
+
     // Handles Sign
-    const isNegative = inputNum.startsWith('-');
+    const trimmedInput = inputNum.trim();
+    const isNegative = trimmedInput.startsWith('-');
     const signStr = isNegative ? '-' : '';
-    let magnitude = isNegative ? inputNum.substring(1) : inputNum;
+    let magnitude = (isNegative || trimmedInput.startsWith('+')) ? trimmedInput.substring(1) : trimmedInput;
 
     // Ensure decimal point exists for easier parsing
     if (!magnitude.includes('.')) {
@@ -615,6 +645,7 @@ export {
     convertDec2BinFPSP,
     convertDec2HexFPSP,
     addOneToMagnitude,
+    isValidMagnitude,
     demonstrateRoundingMethods,
     performOperation
 }

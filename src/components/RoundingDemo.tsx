@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { demonstrateRoundingMethods } from '../operations';
+import { demonstrateRoundingMethods, isValidMagnitude } from '../operations';
 
 type Base = 'decimal' | 'binary';
 type MethodKey = 'chopping' | 'roundUp' | 'roundDown' | 'tiesToEven';
@@ -17,6 +17,7 @@ const RoundingDemo: React.FC = () => {
     const [target, setTarget] = useState(4);
 
     const isBinary = base === 'binary';
+    const isValid = isValidMagnitude(value, isBinary);
 
     const results = useMemo(() => {
         try {
@@ -81,6 +82,13 @@ const RoundingDemo: React.FC = () => {
                 </div>
             </div>
 
+            {!isValid && (
+                <p className="output-rule">
+                    Not a valid {isBinary ? 'binary' : 'decimal'} value &mdash; every rounding method returns NaN.
+                </p>
+            )}
+
+            {isValid && (
             <div className="digit-strip" aria-hidden="true">
                 {strip.isNeg && <span className="digit-cell digit-sign">&minus;</span>}
                 {strip.ip.split('').map((d, i) => (
@@ -95,11 +103,14 @@ const RoundingDemo: React.FC = () => {
                     <span key={`s${i}`} className="digit-cell digit-sticky">{d}</span>
                 ))}
             </div>
+            )}
+            {isValid && (
             <div className="digit-legend">
                 <span><i className="swatch swatch-kept" />kept digits</span>
                 <span><i className="swatch swatch-guard" />guard digit</span>
                 <span><i className="swatch swatch-sticky" />sticky remainder</span>
             </div>
+            )}
 
             {results && (
                 <div className="output-grid two">
