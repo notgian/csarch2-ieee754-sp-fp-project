@@ -48,6 +48,24 @@ The webpage includes three tabs for each of the respective operations.
 | PS Q5 Reverse | `-24.25` | `1100 0001 1100 0010 0000 0000 0000 0000` | Exact bit representation |
 | Edge Magnitudes | `[0.25, 0.125, 4, 8, 16]` | Matches Float32 Array buffer value | Round-trips fractional powers of 2 |
 
+#### Special Case: Positive Overflow → +Infinity
+
+An input too large for single precision (`9.99…e46`) saturates to `+Infinity`: sign `0`, exponent field all ones (E = 255), mantissa all zeros.
+
+![Decimal to IEEE 754 conversion of a value that overflows to positive infinity, showing 0x7F800000](screenshots/Conversion_PositiveInfinityHandling.png)
+
+#### Special Case: Negative Overflow → −Infinity
+
+The same magnitude with a negative sign saturates to `-Infinity`: sign `1`, E = 255, mantissa all zeros.
+
+![Decimal to IEEE 754 conversion of a value that overflows to negative infinity, showing 0xFF800000](screenshots/Conversion_NegativeInfinityHandling.png)
+
+#### Special Case: Invalid Input → NaN
+
+A malformed decimal input (`3.1ks`) is detected and represented as a quiet NaN: E = 255 with a non-zero mantissa.
+
+![Decimal to IEEE 754 conversion of an invalid input, showing NaN and 0x7FC00000](screenshots/Conversion_NAN.png)
+
 ### Decimal to IEEE 754 Hexadecimal (`convertDec2HexFPSP`)
 | Test Description / Category | Input Value | Expected Hex Output | Notes |
 | :--- | :--- | :--- | :--- |
@@ -81,6 +99,12 @@ The webpage includes three tabs for each of the respective operations.
 | **PS Q2 (a)** | `-1.011100` | `true` | 4 (3 frac) | `-1.011` | `-1.011` | `-1.100` | `-1.100` |
 | **PS Q2 (b)** | `-1.011100` | `true` | 3 (2 frac) | `-1.01` | `-1.01` | `-1.10` | `-1.10` |
 
+#### Invalid Input Handling
+
+When the value does not match the selected input format — here `2.31` entered as **binary** — the machine flags the input and every rounding method returns NaN.
+
+![Rounding Methods tab rejecting 2.31 as an invalid binary value, with all four methods returning NaN](screenshots/Rounding_Test.png)
+
 
 ## 3. Arithmetic Operations (`performOperation`)
 
@@ -111,6 +135,18 @@ The webpage includes three tabs for each of the respective operations.
 | `Infinity` | `2` | Multiplication | `Infinity` | — |
 | `Infinity` | `-2` | Multiplication | `-Infinity` | — |
 | `0` | `5` | Multiplication | `0` | — |
+
+#### Special Case: Infinity Result
+
+Adding an overflowing operand (`9.99…e46`, already `+Infinity`) to `1.5` short-circuits to the infinity special case. The step log records the detection, and the final result is reported in binary, hexadecimal (`0x7F800000`), and decimal.
+
+![Arithmetic tab adding an overflowed operand to 1.5, logging the infinity special case and returning +Infinity](screenshots/Arithmetic_PositiveInfinity.png)
+
+#### Special Case: Negative Infinity Result
+
+The mirrored case, where a negative overflowing operand drives the sum to `-Infinity`.
+
+![Arithmetic tab producing an infinity result for the negative overflow case](screenshots/Arithmetic_NegativeInfinity.png)
 
 ---
 
