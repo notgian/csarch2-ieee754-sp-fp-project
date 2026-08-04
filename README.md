@@ -149,10 +149,12 @@ The mirrored case, where a negative overflowing operand drives the sum to `-Infi
 
 ![Arithmetic tab producing an infinity result for the negative overflow case](screenshots/Arithmetic_NegativeInfinity.png)
 
+_Note: These test cases were sourced from the problem sets used in class for module 3 and 4. Credit is given to the group of Hizon et al. and Bancoro et al. (submitted by Schuyler Garcia)._
+
 ---
 
 # Tech Stack
-This project was primarily made in Typescript, using React as the frontend framework. Rsbuild was used as the react build tool to run the project and to build and deploy it to GitHub Pages.
+This project was primarily made in Typescript, using React as the frontend framework. Rsbuild was used as the react build tool to run the project and to build and deploy it to GitHub Pages. RsTest was used for the test suite.
 
 # How to Run Locally
 
