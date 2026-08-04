@@ -169,3 +169,13 @@ Run the unit tests locally with the following command:
 ```bash
 npm run test
 ```
+---
+
+# AI DISCLOSURE
+Generative AI and LLMs (Gemini 3.6 Flash & Claude Sonnet 5) were used to aid in the creation of this project primarily through the following means:
+- ui/ux development
+- debugging assistance
+- test case suggestions and refinement
+- reformatting of text and grammar suggestions
+
+
